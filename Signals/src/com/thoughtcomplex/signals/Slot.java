@@ -15,7 +15,7 @@ import java.util.HashMap;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })
 public @interface Slot {
-    String value();
+    String value() default "";
     
     /**
      * This field is used internally by the Signal/Slot system to

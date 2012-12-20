@@ -28,7 +28,12 @@ public class Signals {
             if (Signal.class.isAssignableFrom(field.getType())) {
                 try {
                     Signal signal = (Signal) field.get(src);
-                    if (signal.getName().equals(srcMessage)) {
+                    String signalName = signal.getName();
+                    if (signalName==null) signalName = field.getName();
+                    if (signalName.equals(srcMessage)) {
+                        CallbackSignature signature = field.getAnnotation(CallbackSignature.class);
+                        if (signature!=null) signal.addSignatureDefinition(signature.value());
+                        
                         signal.connectTo(dest, destMessage);
                         return;
                     }
@@ -38,7 +43,7 @@ public class Signals {
             }
         }
         throw new SignalConnectException(
-                "No public Signal found with that name.", srcMessage,
+                "No public Signal found with the name '"+srcMessage+"'.", srcMessage,
                 destMessage);
     }
 }

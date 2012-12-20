@@ -9,7 +9,7 @@ public class TestModel {
         modelID = id;
     }
     
-    @Slot("click")
+    @Slot()
     public void processClick(int x, int y, int button) {
         System.out.println(modelID + ": Click Start");
         long accumulator = 1;

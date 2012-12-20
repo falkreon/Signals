@@ -13,6 +13,7 @@ public class Test {
     private static TestModel    model2 = new TestModel("B");
     
     public static void main(String[] args) {
+        
         JFrame frame = new JFrame("Test");
         frame.setLayout(new BorderLayout());
         frame.add(button, BorderLayout.CENTER);
@@ -25,10 +26,10 @@ public class Test {
          * other end of the line.
          */
         //try {
-            connect(button, "onClick", model1, "click");
-            connect(button, "onClick", model2, "click");
-            connect(button, "onEnter", model2, "enter");
-            connect(button, "onLeave", model2, "leave");
+            connect(button, "onMouseClicked", model1, "processClick");
+            connect(button, "onMouseClicked", model2, "processClick");
+            connect(button, "onMouseEntered", model2, "enter");
+            connect(button, "onMouseExited", model2, "leave");
         //} catch (SignalConnectException e) {
         //    e.printStackTrace();
         //}

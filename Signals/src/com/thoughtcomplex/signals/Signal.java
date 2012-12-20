@@ -16,9 +16,17 @@ public class Signal {
     private String name;
     private ArrayList<Map.Entry<Object, Method>> callbacks =
             new ArrayList<Map.Entry<Object, Method>>();
+    private Class<?>[] signature = null;
     
     private static String ERROR_NOT_A_SLOT =
             "Non-@Slot method somehow leaked into this Signal's callback list!";
+    
+    /**
+     * Creates a new Signal to be referred to by its field-name.
+     */
+    public Signal() {
+        this.name = null;
+    }
     
     /**
      * Creates a new Signal with the specified name.
@@ -57,12 +65,44 @@ public class Signal {
     }
     
     /**
+     * Add in the method definition from this Signal's {@link CallbackSignature}
+     * annotation. This method is automatically called and not meant for public use.
+     * @param signature
+     */
+    protected void addSignatureDefinition(Class<?>[] signature) {
+        this.signature = signature;
+    }
+    
+    /**
      * Activate this signal, automatically notifying any connected @Slot methods with
      * matching method signatures. If there are problems notifying recipients, the Signal
      * will finish its dispatching before throwing an Exception.
      * @param args
      */
     public void signal(Object... args) throws SignalConnectException {
+        if (signature!=null) {
+          //Check method signature
+            boolean valid = true;
+            
+            if (args.length!=signature.length) {
+                valid=false;
+            } else {
+                
+            }
+            
+            if (!valid) {
+                ArrayList<Class<?>> actual = new ArrayList<Class<?>>();
+                for(Object o : args) actual.add(o.getClass());
+                String argumentsExpected = toClassList(signature);
+                String argumentsPassed = toClassList(actual.toArray(new Class<?>[actual.size()]));
+                
+                throw new SignalConnectException("Invalid arguments sent to Signal: "+
+                        "Expected " + argumentsExpected + " found " +
+                        argumentsPassed,
+                        this.getName(), null);
+            }
+        }
+        
         if (callbacks.isEmpty()) return;
         ArrayList<SignalConnectException> exceptions =
                 new ArrayList<SignalConnectException>();
@@ -120,6 +160,18 @@ public class Signal {
         for(SignalConnectException e : exceptions) throw e;
     }
     
+    private String toClassList(Class<?>[] definition) {
+        String result = "(";
+        for(int i=0; i<definition.length; i++) {
+            result+=definition[i].getSimpleName();
+            if (i<definition.length-1) result+=", ";
+        }
+        result+=")";
+        return result;
+    }
+    
+    
+    
     /**
      * Connect this signal to all slots of the designated name on the recipient.
      * 
@@ -136,10 +188,17 @@ public class Signal {
         boolean candidatesFound = false;
         for (Method m : o.getClass().getMethods()) {
             Slot s = m.getAnnotation(Slot.class);
-            if (s != null && s.value().equals(slotName)) {
-                // This method is annotated as a Slot with the correct name.
-                addCallback(o, m);
-                candidatesFound = true;
+            if (s != null) {
+                String foundSlotName = s.value();
+                if (foundSlotName==null || foundSlotName.isEmpty()) {
+                    foundSlotName = m.getName();
+                }
+                
+                if (foundSlotName.equals(slotName)) {
+                    // This method is annotated as a Slot with the correct name.
+                    addCallback(o, m);
+                    candidatesFound = true;
+                }
             }
         }
         
@@ -149,5 +208,25 @@ public class Signal {
         }
         
         return this;
+    }
+    
+    /* TODO: WORK IN PROGRESS
+    public void disconnect(Object o, String slotName) {
+        
+        synchronized(callbacks) {
+            for(Map.Entry<Object, Method> entry : callbacks) {
+                if (entry.getKey().equals(o)) {
+                    String 
+                }
+            }
+        }
+    }*/
+    
+    public void disconnectAll(Object o) {
+        //TODO: implement
+    }
+    
+    public void disconnectAll() {
+        //TODO: implement
     }
 }
