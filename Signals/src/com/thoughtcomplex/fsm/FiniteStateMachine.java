@@ -12,7 +12,7 @@ public class FiniteStateMachine<T> implements StateMachine<T> {
      * @signature       onStateChanged(T oldState, T newState);
      */
     @CallbackSignature({Object.class, Object.class})
-    Signal onStateChanged;
+    public Signal onStateChanged = new Signal();
     
     private ArrayList<T> validStates = new ArrayList<T>();
     private T currentState = null;
