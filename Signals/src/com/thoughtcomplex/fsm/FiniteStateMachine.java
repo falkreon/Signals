@@ -17,6 +17,20 @@ public class FiniteStateMachine<T> implements StateMachine<T> {
     private ArrayList<T> validStates = new ArrayList<T>();
     private T currentState = null;
     
+    public FiniteStateMachine(T initialState, Class<T> validStates) {
+        currentState = initialState;
+        if (!validStates.isEnum()) {
+            throw new InvalidStateException( "Class '" + validStates.getSimpleName() +
+                    "' is not an enum type, and cannot be used as a set of valid states.",
+                    null);
+        } else {
+            for(T state : validStates.getEnumConstants()) {
+                this.validStates.add(state);
+            
+            }
+        }
+    }
+    
     public FiniteStateMachine(T initialState, T... otherValidStates) {
         currentState = initialState;
         validStates.add(initialState);

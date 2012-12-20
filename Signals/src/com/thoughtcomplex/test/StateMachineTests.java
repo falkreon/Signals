@@ -52,11 +52,22 @@ public class StateMachineTests {
         stateMessageTriggered = true;
     }
     
-    @Test()
+    @Test
     public void stateMessage() {
         FiniteStateMachine<String> fsm2 = new FiniteStateMachine<String>("A","B");
         fsm2.onStateChanged.connectTo(this, "receiveMessage");
         fsm2.setState("B");
         assertTrue(stateMessageTriggered);
+    }
+    
+    @Test
+    /**
+     * Verify that the FSM constructs properly from an enum class, and that after construction
+     * it contains a valid set of states.
+     */
+    public void addAllEnum() {
+        FiniteStateMachine<TestState> fsm3 = new FiniteStateMachine<TestState>(TestState.BEGIN, TestState.class);
+        fsm3.setState(TestState.CONTINUE);
+        assertEquals(fsm3.getState(), TestState.CONTINUE);
     }
 }
