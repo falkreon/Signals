@@ -31,7 +31,7 @@ public class TestModel {
     
     @Slot("enter")
     public void processEnter(int x, int y) {
-        System.out.println(modelID + ": Enter");
+        //System.out.println(modelID + ": Enter");
     }
     
     @Slot("leave")
