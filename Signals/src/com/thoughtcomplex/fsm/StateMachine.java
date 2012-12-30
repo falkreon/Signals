@@ -1,6 +1,8 @@
 package com.thoughtcomplex.fsm;
 
-public interface StateMachine<T> {
+import com.thoughtcomplex.event.Observable;
+
+public interface StateMachine<T> extends Observable<StateChangedEvent<T>> {
     public T getState();
     public void setState(T state);
 }

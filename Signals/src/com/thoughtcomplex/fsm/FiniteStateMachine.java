@@ -2,10 +2,15 @@ package com.thoughtcomplex.fsm;
 
 import java.util.ArrayList;
 
+import com.thoughtcomplex.event.EventListener;
+import com.thoughtcomplex.event.EventMulticaster;
 import com.thoughtcomplex.signals.CallbackSignature;
 import com.thoughtcomplex.signals.Signal;
 
 public class FiniteStateMachine<T> implements StateMachine<T> {
+    
+    private EventMulticaster<StateChangedEvent<T>> stateChanged = new EventMulticaster<StateChangedEvent<T>>();
+    
     /**
      * Fires when the machine's state changes.
      * 
@@ -57,5 +62,17 @@ public class FiniteStateMachine<T> implements StateMachine<T> {
         }
         
     }
+
+    @Override
+    public void addListener(EventListener<StateChangedEvent<T>> listener) {
+        stateChanged.addListener(listener);
+    }
+
+    @Override
+    public void removeListener(EventListener<StateChangedEvent<T>> listener) {
+        stateChanged.removeListener(listener);
+    }
+
+    
     
 }
