@@ -1,9 +1,13 @@
 package com.thoughtcomplex.test;
 
 import java.awt.BorderLayout;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 import javax.swing.JFrame;
 
+import com.thoughtcomplex.data.IFFChunk;
 import com.thoughtcomplex.event.CollisionEvent;
 import com.thoughtcomplex.event.EventListener;
 import com.thoughtcomplex.event.EventMulticaster;
@@ -20,7 +24,7 @@ public class Test {
     private static TestModel    model2 = new TestModel("B");
     
     public static void main(String[] args) {
-        /*
+        
         try {
             File f = new File("test.aif");
             System.out.println(f.getAbsolutePath());
@@ -28,13 +32,13 @@ public class Test {
         } catch (IOException ex) {
             System.out.println("Failed to read test file.");
             ex.printStackTrace();
-        }*/
+        }
         
-        JFrame frame = new JFrame("Test");
-        frame.setLayout(new BorderLayout());
-        frame.add(button, BorderLayout.CENTER);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
+        //JFrame frame = new JFrame("Test");
+        //frame.setLayout(new BorderLayout());
+        //frame.add(button, BorderLayout.CENTER);
+        //frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        //frame.pack();
         
         
         /*
@@ -42,30 +46,31 @@ public class Test {
          * to consumers, without the objects knowing what objects are at the
          * other end of the line.
          */
-        connect(button, "onMouseClicked", model1, "processClick");
-        connect(button, "onMouseClicked", model2, "processClick");
-        connect(button, "onMouseEntered", model2, "enter");
-        connect(button, "onMouseExited", model2, "leave");
+        //connect(button, "onMouseClicked", model1, "processClick");
+        //connect(button, "onMouseClicked", model2, "processClick");
+        //connect(button, "onMouseEntered", model2, "enter");
+        //connect(button, "onMouseExited", model2, "leave");
         
         // All objects are "configured," so now let's let the system go and see
         // what it does.
-        frame.setVisible(true);
+        //frame.setVisible(true);
         
         /*
          * Instance and configure a typical Generic-POJO-event-handler setup.
          */
+        /*
         EventMulticaster<CollisionEvent> onCollide = new EventMulticaster<CollisionEvent>();
         onCollide.addListener(new EventListener<CollisionEvent>() {
             @Override
             public void onEvent(CollisionEvent event) {
                 //Do Nothing. Just testing the binding speed.
             }
-        });
+        });*/
         
         //Send some test signals
         
-        timeTest1(button.onMouseEntered);
-        timeTest2(onCollide);
+        //timeTest1(button.onMouseEntered);
+        //timeTest2(onCollide);
     }
     
     public static void timeTest1(Signal s) {
