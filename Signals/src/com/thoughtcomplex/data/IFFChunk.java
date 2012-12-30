@@ -2,6 +2,7 @@ package com.thoughtcomplex.data;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
@@ -11,31 +12,42 @@ public class IFFChunk {
     ByteBuffer data;
     String tag;
     ArrayList<IFFChunk> contents = new ArrayList<IFFChunk>();
+    boolean dataContainsHeader = false;
     
     private IFFChunk() {}
     
-    private void init() {
+    private void init(boolean readTagAndSize) {
         data.rewind();
-        int intTag = data.getInt();
-        tag = "" + (char)(intTag>>24 & 0xFF) + (char)(intTag>>16 & 0xFF) +
-                   (char)(intTag>>8 & 0xFF) +  (char)(intTag & 0xFF);
-        int length = data.getInt() & 0x7FFFFFFF; //byteOrder(data.getInt());
+        int length = data.limit();
+        if (readTagAndSize) {
+            dataContainsHeader = true;
+            int intTag = data.getInt();
+            tag = "" + (char)(intTag>>24 & 0xFF) + (char)(intTag>>16 & 0xFF) +
+                       (char)(intTag>>8 & 0xFF) +  (char)(intTag & 0xFF);
+            length = data.getInt() & 0x7FFFFFFF; //byteOrder(data.getInt());
+        }
         System.out.println("Raw Length: "+length);
         if (length<0) length=1;
         if (length%2!=0) length++;
-        if (length+8>data.limit()) {
+        if (dataContainsHeader && length+8>data.limit()) {
             System.out.println("==DATA PANIC==");
             for(int i=0; i<20; i++) {
                 byte b = data.get();
                 System.out.println("DATA: "+b+": "+(char)b);
             }
         }
-        System.out.println("Limiting to "+(length+8));
+        
         //if (length+8<data.limit())
         data.position(0);
-        data.limit(length+8);
-        data.position(8);
-        System.out.println("Chunk Type: "+tag+" Length: "+(length+8)+" (incl. header)");
+        if (dataContainsHeader) {
+            System.out.println("Limiting to "+(length+8));
+            data.limit(length+8);
+            data.position(8);
+        } else {
+            data.position(0);
+        }
+        
+        System.out.println("Chunk Type: "+tag+" Length: "+(data.limit())+" (incl. header)");
         
         if (tag.equals("FORM")) {
             int formTypeInt = data.getInt();
@@ -49,9 +61,8 @@ public class IFFChunk {
                 IFFChunk child = new IFFChunk();
                 child.data = tempData.slice();
                 
-                child.init();
+                child.init(true);
                 contents.add(child);
-                //tempData.position(child.data.limit());
                 int dataSize = child.data.limit();
                 if (dataSize%2!=0) dataSize++;
                 tempData.position(0);
@@ -68,7 +79,7 @@ public class IFFChunk {
         
         if (tag.equals("COMT")) {
             int timestamp = data.getInt();  //seconds since Jan 1, 1904 (On Amiga, since Jan 1, 1978)
-            int markerID = data.getInt(); //bollocks
+            int markerID = data.getInt();   //the id of the sample frame marker
             int commentLength = data.getShort() & 0x7FFF;
             System.out.println("Raw Comment Length: "+commentLength);
             if (commentLength>data.limit()-data.position()) commentLength = (short) (data.limit()-data.position());
@@ -84,28 +95,59 @@ public class IFFChunk {
 
     }
     
+    public String getTag() {
+        return tag;
+    }
     
+    public byte[] getData() {
+        data.position(0);
+        if (dataContainsHeader) {
+            data.position(8);
+            byte[] result = new byte[data.limit()-8];
+            data.get(result, 0, result.length);
+            return result;
+        } else {
+            byte[] result = new byte[data.limit()];
+            data.get(result, 0, result.length);
+            return result;
+        }
+    }
+    
+    public void write(OutputStream out) throws IOException {
+        if (!dataContainsHeader) {
+            ByteBuffer header = ByteBuffer.allocate(8);
+            header.put(tag.getBytes());
+            header.putInt(data.limit());
+            out.write(header.array());
+        }
+        data.position(0);
+        while(data.position()<data.limit()) {
+            out.write(data.get());
+        }
+    }
+    
+    public static IFFChunk fromStream(String tag, InputStream in) throws IOException {
+        IFFChunk result = new IFFChunk();
+        if (tag.length()!=4) throw new IllegalArgumentException("Tag must be 4 characters.");
+        result.tag = tag;
+        result.data = ByteBuffer.wrap(Streams.readAll(in));
+        result.init(false);
+        return result;
+    }
     
     public static IFFChunk fromStream(InputStream in) throws IOException {
         IFFChunk result = new IFFChunk();
         result.data = ByteBuffer.wrap(Streams.readAll(in));
-        result.init();
+        result.init(true);
         return result;
     }
     
-    public static IFFChunk fromArray(byte[] in) throws IOException {
+    public static IFFChunk fromArray(String tag, byte[] in) throws IOException {
         IFFChunk result = new IFFChunk();
+        if (tag.length()!=4) throw new IllegalArgumentException("Tag must be 4 characters.");
+        result.tag = tag;
         result.data = ByteBuffer.wrap(in);
-        result.init();
+        result.init(false);
         return result;
-    }
-    
-    private static int byteOrder(int i) {
-        int b1 = i >> 24 & 0xFF;
-        int b2 = i >> 16 & 0xFF;
-        int b3 = i >>  8 & 0xFF;
-        int b4 = i       & 0xFF;
-        
-        return (b4 << 24) | (b3 << 16) | (b2 << 8) | b1;
     }
 }
