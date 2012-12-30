@@ -1,23 +1,21 @@
 package com.thoughtcomplex.event;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Iterator;
 
-public class EventMulticaster<T extends SignalEvent> {
-    private ArrayList<EventListener<T>> listeners = new ArrayList<EventListener<T>>();
-    private boolean threaded = false;
+public class EventMulticaster<T extends SignalEvent> implements Observable<T> {
+    private ArrayList<WeakReference<EventListener<T>>> listeners = new ArrayList<WeakReference<EventListener<T>>>();
     
     public EventMulticaster() {
-        threaded=false;
-    }
-    
-    public EventMulticaster(boolean threaded) {
-        this.threaded = threaded;
     }
     
     public void invoke(final T event) {
-        for(final EventListener<T> listener : listeners) {
-            if (threaded) {
-                new Thread( new Runnable() { public void run() { listener.onEvent(event); } }).start();
+        for (Iterator<WeakReference<EventListener<T>>> iterator = listeners.iterator(); iterator.hasNext();) {
+            WeakReference<EventListener<T>> weakRef = iterator.next();
+            EventListener<T> listener = weakRef.get();
+            if (listener==null) {
+                iterator.remove();
             } else {
                 listener.onEvent(event);
             }
@@ -25,10 +23,14 @@ public class EventMulticaster<T extends SignalEvent> {
     }
     
     public void addListener(EventListener<T> listener) {
-        listeners.add(listener);
+        listeners.add(new WeakReference<EventListener<T>>(listener));
     }
     
-    public void removeListener(EventListener<T> listener) {
-        listeners.remove(listener);
+    public void removeListener(EventListener<T> toRemove) {
+        for (Iterator<WeakReference<EventListener<T>>> iterator = listeners.iterator(); iterator.hasNext();) {
+            WeakReference<EventListener<T>> weakRef = iterator.next();
+            EventListener<T> listener = weakRef.get();
+            if (listener==null || listener.equals(toRemove)) iterator.remove();
+        }
     }
 }
