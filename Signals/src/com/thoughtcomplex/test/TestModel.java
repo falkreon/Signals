@@ -3,7 +3,6 @@ package com.thoughtcomplex.test;
 import org.lwjgl.input.Keyboard;
 
 import com.thoughtcomplex.game.GameSection;
-import com.thoughtcomplex.game.TickEvent;
 import com.thoughtcomplex.image.GLColor;
 import com.thoughtcomplex.image.GLDrawingContext;
 
@@ -15,14 +14,21 @@ public class TestModel extends GameSection {
    
 
     @Override
-    public void onEvent(TickEvent event) {
+    public void tick() {
         if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
            
             Test.testGame.end();
         }
     }
 
-    @Override
+    public void paint(int x, int y) {
+        paint();
+    }
+    
+    public void paint(int x, int y, int width, int height) {
+        paint();
+    }
+    
     public void paint() {
         GLDrawingContext.paintLine(0, 0, 100, 100, 3, new GLColor((float)Math.random(),(float)Math.random(),1.0f));
         

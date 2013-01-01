@@ -1,9 +1,7 @@
 package com.thoughtcomplex.game;
 
-import com.thoughtcomplex.event.EventListener;
+import com.thoughtcomplex.image.Paintable;
 
-public abstract class GameSection implements EventListener<TickEvent> {
-
-    public abstract void paint();
+public abstract class GameSection implements Ticking, Paintable {
     
 }

@@ -25,7 +25,7 @@ public class Game extends FiniteStateMachine<GameSection> implements EventListen
     
     public void start() {
         if (timer!=null && timer.isActive()) return;
-        timer = new TimingCore(12000L);
+        timer = new TimingCore(16666666L); //60FPS
         timer.addListener(this);
         timer.start();
     }
@@ -52,13 +52,13 @@ public class Game extends FiniteStateMachine<GameSection> implements EventListen
         
         //distribute ticks to the current state
         Keyboard.poll(); //keep Keyboard up to date.
-        getState().onEvent(event);
+        getState().tick();
         
         //paint the screen
         GLDrawingContext.clear();
         GLDrawingContext.screen.activateSurface();
         GLDrawingContext.clear(); //yes, this is necessary.
-        getState().paint();
+        getState().paint(0, 0, width, height);
         GLDrawingContext.screen.deactivateSurface();
         GLDrawingContext.display();
         
