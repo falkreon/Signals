@@ -1,4 +1,4 @@
-package com.thoughtcomplex.fsm;
+package com.thoughtcomplex.state;
 
 import java.util.ArrayList;
 

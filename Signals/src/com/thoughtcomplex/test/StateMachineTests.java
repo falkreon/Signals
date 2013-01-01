@@ -4,9 +4,9 @@ import org.junit.Before;
 import org.junit.Test;
 import static junit.framework.Assert.*;
 
-import com.thoughtcomplex.fsm.FiniteStateMachine;
-import com.thoughtcomplex.fsm.InvalidStateException;
 import com.thoughtcomplex.signals.Slot;
+import com.thoughtcomplex.state.FiniteStateMachine;
+import com.thoughtcomplex.state.InvalidStateException;
 
 public class StateMachineTests {
     

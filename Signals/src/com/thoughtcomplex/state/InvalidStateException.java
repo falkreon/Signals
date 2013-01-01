@@ -1,4 +1,4 @@
-package com.thoughtcomplex.fsm;
+package com.thoughtcomplex.state;
 
 public class InvalidStateException extends RuntimeException {
     Object invalidState;
