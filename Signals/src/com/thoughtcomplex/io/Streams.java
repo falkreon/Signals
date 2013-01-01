@@ -18,6 +18,21 @@ public class Streams {
         }
     }
     
+    public static Thread routeAsync(final InputStream in, final OutputStream out){
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    route(in,out);
+                } catch (IOException ex) {  
+                }
+            }
+        });
+        
+        t.start();
+        return t;
+    }
+    
     public static byte[] readAll(final InputStream in) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         route(in, out);

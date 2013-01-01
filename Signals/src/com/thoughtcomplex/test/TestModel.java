@@ -1,41 +1,31 @@
 package com.thoughtcomplex.test;
 
-import com.thoughtcomplex.signals.Slot;
+import org.lwjgl.input.Keyboard;
 
-public class TestModel {
-    private String modelID = "?";
+import com.thoughtcomplex.game.GameSection;
+import com.thoughtcomplex.game.TickEvent;
+import com.thoughtcomplex.image.GLColor;
+import com.thoughtcomplex.image.GLDrawingContext;
+
+public class TestModel extends GameSection {
     
-    public TestModel(String id) {
-        modelID = id;
+    public TestModel() {
     }
     
-    @Slot()
-    public void processClick(int x, int y, int button) {
-        System.out.println(modelID + ": Click Start");
-        long accumulator = 1;
-        for(long a = 0; a<100L; a++) {
-            System.out.println(modelID + " is processing: "+accumulator);
-            accumulator += (accumulator / 2L) + 1L;
+   
+
+    @Override
+    public void onEvent(TickEvent event) {
+        if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
+           
+            Test.testGame.end();
         }
     }
-    
-    @Slot("press")
-    public void processPress(int x, int y, int button) {
-        System.out.println(modelID + ": Press");
-    }
-    
-    @Slot("release")
-    public void processRelease(int x, int y, int button) {
-        System.out.println(modelID + ": Release");
-    }
-    
-    @Slot("enter")
-    public void processEnter(int x, int y) {
-        //System.out.println(modelID + ": Enter");
-    }
-    
-    @Slot("leave")
-    public void processLeave(int x, int y) {
-        System.out.println(modelID + ": Leave");
+
+    @Override
+    public void paint() {
+        GLDrawingContext.paintLine(0, 0, 100, 100, 3, new GLColor((float)Math.random(),(float)Math.random(),1.0f));
+        
+        GLDrawingContext.fillRect(100, 150, 100, 100, new GLColor((float)Math.random(),(float)Math.random(), (float)Math.random()));
     }
 }
