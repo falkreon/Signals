@@ -1,4 +1,4 @@
-package com.thoughtcomplex.starlight.image;
+package com.thoughtcomplex.image;
 import java.nio.ByteBuffer;
 
 import org.lwjgl.opengl.GL11;

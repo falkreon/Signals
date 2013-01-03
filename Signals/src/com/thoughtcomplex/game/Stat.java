@@ -10,7 +10,8 @@ import com.thoughtcomplex.state.StateMachine;
  * minimum of zero and a predetermined integer maximum. All operations perform
  * saturation math to keep the Stat within the specified range.
  * 
- * 
+ * Stat also contains convenience logic for poisoning and regenerating the stat over
+ * time. In order for this to work, the Stat must receive regular ticks through Ticking.
  * 
  * @author Isaac Ellingson
  */
@@ -20,9 +21,9 @@ public class Stat implements StateMachine<Integer>, Ticking {
     
     private volatile double     value          = 20;    // mutable
     private double              maxValue       = 20;    // immutable
-    private double              regenRate      = 0;     // mutable
-    private double              poisonRate     = 0;     // mutable
-    private int                 poisonDuration = 0;     // mutable
+    private volatile double     regenRate      = 0;     // mutable
+    private volatile double     poisonRate     = 0;     // mutable
+    private volatile int        poisonDuration = 0;     // mutable
     
     public Stat(int maxValue) {
         this.value = maxValue;

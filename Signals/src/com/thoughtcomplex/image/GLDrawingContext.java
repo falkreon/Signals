@@ -13,7 +13,6 @@ import org.lwjgl.opengl.GL11;
  */
 
 import com.thoughtcomplex.image.GLColor;
-import com.thoughtcomplex.starlight.image.VirtualScreen;
 
 public class GLDrawingContext {
     private static int virtualWidth = 800;
