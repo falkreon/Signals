@@ -1,6 +1,7 @@
 package com.thoughtcomplex.game.physics;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 
 public class Vector {
     
@@ -42,8 +43,12 @@ public class Vector {
         return vy;
     }
     
+    public double getVelocity() {
+        return Math.hypot(Math.abs(vx), Math.abs(vy));
+    }
+    
     public double getAngle() {
-        return Math.atan2(vy, vx);
+        return normalizeAngle( Math.atan2(vy, vx) );
     }
     
     public Vector add(Vector v) {
@@ -84,8 +89,14 @@ public class Vector {
         
         
         //continue to eval: Not very fluent!
-        return this.subtract( wallNormal.multiply(2.0D * this.dotProduct(wallNormal)) );
+        double direction = this.subtract( wallNormal.multiply(2.0D * this.dotProduct(wallNormal)) ).getAngle();
         
+        double magnitude = this.getVelocity();
+        
+        
+        //System.out.println("DIR "+tauString(direction)+" M "+magnitude);
+        
+        return Vector.ofPolarCoordinates(direction, magnitude);
         //double s = 2.0D * ( (this.vx * wallNormal.vx) + (this.vy * wallNormal.vy) );
         //double xp = this.vx - (s*wallNormal.vx);
         //double yp = this.vy - (s*wallNormal.vy);
@@ -114,5 +125,21 @@ public class Vector {
         double vy = Math.sin(angle)*length;
         
         return new Vector(vx, vy);
+    }
+    
+    private String tauString(double theta) {
+        double tauUnits = Math.abs(theta)/TAU;
+        NumberFormat nf = NumberFormat.getPercentInstance();
+        String returnValue = nf.format(tauUnits);
+        if (theta<0) returnValue = "-"+returnValue;
+        return returnValue+"T";
+    }
+    
+    private double normalizeAngle(double in) {
+        double temp = in;
+        while (temp<0) temp+=TAU;
+        if (temp>TAU) temp = temp % TAU;
+        
+        return temp;
     }
 }
